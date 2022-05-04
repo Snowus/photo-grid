@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import axios from "axios";
+// import axios from "axios";
+import { client } from '../../api/client';
 
 class ScrollComponent extends Component {
   constructor() {
@@ -7,26 +8,30 @@ class ScrollComponent extends Component {
     this.state = {
       photos: [],
       loading: false,
-      page: 0,
+      page: 1,
       prevY: 0
     };
   }
 
-  getPhotos(page) {
+  async getPhotos(page) {
     this.setState({ loading: true });
-    axios
-      .get(
-        `https://jsonplaceholder.typicode.com/photos?_page=${page}&_limit=10`
-      )
+    console.log(this.state.page);
+    await client
+      .get('curated', {
+        params: {
+          per_page: 10,
+          page: page
+        }
+      })
       .then(res => {
-        this.setState({ photos: [...this.state.photos, ...res.data] });
+        this.setState({ photos: [...this.state.photos, ...res.data.photos] });
         this.setState({ loading: false });
       });
   }
 
   componentDidMount() {
     this.getPhotos(this.state.page);
-
+    console.log(this.state.loading);
     var options = {
       root: null,
       rootMargin: "0px",
@@ -44,9 +49,9 @@ class ScrollComponent extends Component {
     const y = entities[0].boundingClientRect.y;
     if (this.state.prevY > y) {
       const lastPhoto = this.state.photos[this.state.photos.length - 1];
-      const curPage = lastPhoto.albumId;
-      this.getPhotos(curPage);
-      this.setState({ page: curPage });
+      this.setState( {page: this.state.page + 1})
+      this.getPhotos(this.state.page);
+      // this.setState({ page: this.curPage });
     }
     this.setState({ prevY: y });
   }
@@ -65,8 +70,8 @@ class ScrollComponent extends Component {
     return (
       <div className="container">
         <div style={{ minHeight: "800px" }}>
-          {this.state.photos.map(user => (
-            <img src={user.url} height="100px" width="200px" />
+          {this.state.photos.map(photo => (
+            <img src={photo.src.original} height="100px" width="200px" />
           ))}
         </div>
         <div

@@ -7,7 +7,7 @@ import ScrollComponent from './components/InfiniteScrolling'
 const App = () => (
   <>
     <Header />
-    <Home />
+    {/* <Home /> */}
     <ScrollComponent/>
   </>
 )
